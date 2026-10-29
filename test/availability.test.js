@@ -58,7 +58,7 @@ test("a slot must fit inside the working window", () => {
 });
 
 test("buffers block the slot that would run into a booking", () => {
-  const booking = { id: "b1", staffId: "st", start: Date.UTC(2026, 9, 26, 18, 0), end: Date.UTC(2026, 9, 26, 19, 0) }; // 14:00–15:00 New York
+  const booking = { id: "b1", staffId: "st", start: Date.UTC(2026, 9, 26, 18, 0), end: Date.UTC(2026, 9, 26, 19, 0) }; // 14:00-15:00 New York
   const slots = slotsFor(MONDAY, { bookings: [booking], service: { bufferAfterMinutes: 15, bufferBeforeMinutes: 15 } });
   const labels = slots.map((slot) => timeLabel(slot.start, NY));
   assert.deepEqual(labels, ["09:00", "10:00", "11:00", "16:00"], "13:00, 14:00 and 15:00 all violate a buffer");
@@ -66,7 +66,7 @@ test("buffers block the slot that would run into a booking", () => {
 });
 
 test("blackouts remove slots and can be staff-specific", () => {
-  const blackout = { id: "x", staffId: null, start: Date.UTC(2026, 9, 26, 17, 0), end: Date.UTC(2026, 9, 26, 19, 0) }; // 13:00–15:00 New York
+  const blackout = { id: "x", staffId: null, start: Date.UTC(2026, 9, 26, 17, 0), end: Date.UTC(2026, 9, 26, 19, 0) }; // 13:00-15:00 New York
   const slots = slotsFor(MONDAY, { blackouts: [blackout] });
   assert.deepEqual(slots.map((slot) => timeLabel(slot.start, NY)), ["09:00", "10:00", "11:00", "15:00", "16:00"]);
   const otherStaff = slotsFor(MONDAY, { blackouts: [{ ...blackout, staffId: "someone-else" }] });

@@ -80,7 +80,7 @@ function eventFor(booking, { now, domain, organizer }) {
     `DTSTAMP:${formatICSDate(now)}`,
     `DTSTART:${formatICSDate(booking.start)}`,
     `DTEND:${formatICSDate(booking.end)}`,
-    `SUMMARY:${escapeText(`${serviceName}${customer.name ? ` — ${customer.name}` : ""}`)}`,
+    `SUMMARY:${escapeText(`${serviceName}${customer.name ? `, ${customer.name}` : ""}`)}`,
     `DESCRIPTION:${escapeText(description)}`,
     `LOCATION:${escapeText(booking.location || "Studio")}`,
     `STATUS:${booking.status === "cancelled" ? "CANCELLED" : "CONFIRMED"}`,

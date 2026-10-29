@@ -62,7 +62,7 @@ test("the exported calendar parses back into the same booking", () => {
   assert.equal(event.uid, "bk-1001@slotwise.arviontech.net");
   assert.equal(event.DTSTART, BOOKING.start);
   assert.equal(event.DTEND, BOOKING.end);
-  assert.match(event.summary, /Strategy session — Dana Whitfield/);
+  assert.match(event.summary, /Strategy session, Dana Whitfield/);
   assert.match(event.description, /Maya Chen/);
   assert.match(event.description, /Bring the current onboarding flow, plus the pricing page/);
   assert.equal(event.location, "12 Mercer Street, New York");

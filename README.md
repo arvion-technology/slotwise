@@ -2,7 +2,7 @@
 <img src="docs/demo.gif" alt="Slotwise week calendar with availability bands, bookings and a timezone-aware slot picker" width="100%" />
 </div>
 
-<sub>Recorded from the live demo — <a href="docs/demo.mp4">MP4</a> · <a href="docs/screenshot.png">static frame</a></sub>
+<sub>Recorded from the live demo, <a href="docs/demo.mp4">MP4</a> · <a href="docs/screenshot.png">static frame</a></sub>
 
 # Slotwise
 
@@ -16,12 +16,12 @@ The demo studio is four services and three practitioners on America/New_York tim
 
 ## What it does
 
-- **Week calendar** — a seven-day grid with working-hour shading, service-coloured bookings, a live "now" line and day selection.
-- **Availability engine** — weekly rota windows, lunch breaks, per-service prep and reset buffers, slot intervals, minimum notice, per-staff and studio-wide blackouts.
-- **Viewer timezone** — convert the studio's instants into New York, London, Kathmandu, Tokyo, Sydney or UTC; slots that cross the viewer's date land in the right column.
-- **Booking flow** — pick a slot, choose the practitioner, enter customer details, then get a confirmation with a downloadable `.ics` file.
-- **Bookings list** — upcoming and past sessions, per-booking ICS export, cancellation quotes and a whole-calendar export.
-- **Engine notes** — the live offset, the 23-hour and 25-hour DST days, an overnight-window example and the exact conversion steps.
+- **Week calendar**: a seven-day grid with working-hour shading, service-coloured bookings, a live "now" line and day selection.
+- **Availability engine**: weekly rota windows, lunch breaks, per-service prep and reset buffers, slot intervals, minimum notice, per-staff and studio-wide blackouts.
+- **Viewer timezone**: convert the studio's instants into New York, London, Kathmandu, Tokyo, Sydney or UTC; slots that cross the viewer's date land in the right column.
+- **Booking flow**: pick a slot, choose the practitioner, enter customer details, then get a confirmation with a downloadable `.ics` file.
+- **Bookings list**: upcoming and past sessions, per-booking ICS export, cancellation quotes and a whole-calendar export.
+- **Engine notes**: the live offset, the 23-hour and 25-hour DST days, an overnight-window example and the exact conversion steps.
 
 ## Screenshots
 
@@ -63,10 +63,10 @@ The conversion has three cases, and the code represents all three rather than pi
 
 ```js
 zonedTimeToInstants({ year: 2026, month: 3, day: 8, hour: 2, minute: 30 }, "America/New_York");
-// []  — 02:30 does not exist; the clock jumps from 02:00 to 03:00
+// [], 02:30 does not exist; the clock jumps from 02:00 to 03:00
 
 zonedTimeToInstants({ year: 2026, month: 11, day: 1, hour: 1, minute: 30 }, "America/New_York");
-// [05:30Z, 06:30Z] — 01:30 happens twice; "earlier" is the default
+// [05:30Z, 06:30Z], 01:30 happens twice; "earlier" is the default
 
 zonedDayLength("2026-03-08", "America/New_York"); // 23 hours
 zonedDayLength("2026-11-01", "America/New_York"); // 25 hours
@@ -84,11 +84,11 @@ weekly windows → wall times → instants (skip gaps)
   → reject if the start is inside minNoticeMinutes from now
 ```
 
-Buffers may extend past the edge of the working window — prepping before the first meeting does not require the studio to open earlier — but they always count when checking conflicts. Overnight windows (`22:00`–`06:00`) keep their starting date: the service date is Monday while several slots fall on Tuesday in the wall clock. The tests pin that case, along with a 23-hour day and a repeated hour.
+Buffers may extend past the edge of the working window, prepping before the first meeting does not require the studio to open earlier, but they always count when checking conflicts. Overnight windows (`22:00`, `06:00`) keep their starting date: the service date is Monday while several slots fall on Tuesday in the wall clock. The tests pin that case, along with a 23-hour day and a repeated hour.
 
 **Display is a projection, not a second data model.** Slots are generated on the studio's calendar dates. To draw the viewer's week, each slot's absolute start is converted to the viewer's zone and bucketed by the viewer's date. Change the selector to Asia/Kathmandu and a 09:00 New York session appears at 18:45 the same day; a late New York session can move to the next Kathmandu day. The booking keeps its instant, which is why the `.ics` file is unambiguous.
 
-**ICS is written for other calendars, not for us.** Every line ends CRLF; long lines are folded at 75 UTF-8 octets with a leading space on continuations; commas, semicolons, backslashes and newlines are escaped; times are written in UTC with `DTSTART:20261102T190000Z`. The repository also ships a small parser because a serialiser with no reader is untested by construction — the tests export a booking, parse it back and compare the instants.
+**ICS is written for other calendars, not for us.** Every line ends CRLF; long lines are folded at 75 UTF-8 octets with a leading space on continuations; commas, semicolons, backslashes and newlines are escaped; times are written in UTC with `DTSTART:20261102T190000Z`. The repository also ships a small parser because a serialiser with no reader is untested by construction, the tests export a booking, parse it back and compare the instants.
 
 **Cancellation tiers select the best applicable window, not the first one.** A booking 72 hours out must match the free tier even though the 24-hour tier also "matches". `cancellationQuote()` sorts tiers by threshold and picks the largest one the booking still clears; the fee is basis points of the price rounded once in integer minor units, so the refund plus fee always equals the price.
 
@@ -100,11 +100,11 @@ npm test
 
 37 tests on `node:test`:
 
-- `test/timezone.test.js` — DST offsets, spring gaps, fall overlaps and disambiguation, 23/25-hour days, zone-correct date keys, labels, calendar arithmetic and leap years.
-- `test/availability.test.js` — window and lunch-break handling, slot fitting, buffers, blackouts, minimum notice, overnight windows, both DST transitions, multi-staff flattening, range generation and conflict semantics.
-- `test/ics.test.js` — envelope, CRLF, UTC formatting, escaping, 75-octet folding, a full export/parse round trip and cancelled status.
-- `test/policy.test.js` — tier boundaries, half and full fees, integer rounding, past bookings, custom policies and reschedule windows.
-- `test/sample.test.js` — the seeded studio is internally consistent and generated slots never collide with its bookings or blackouts.
+- `test/timezone.test.js`: DST offsets, spring gaps, fall overlaps and disambiguation, 23/25-hour days, zone-correct date keys, labels, calendar arithmetic and leap years.
+- `test/availability.test.js`: window and lunch-break handling, slot fitting, buffers, blackouts, minimum notice, overnight windows, both DST transitions, multi-staff flattening, range generation and conflict semantics.
+- `test/ics.test.js`: envelope, CRLF, UTC formatting, escaping, 75-octet folding, a full export/parse round trip and cancelled status.
+- `test/policy.test.js`: tier boundaries, half and full fees, integer rounding, past bookings, custom policies and reschedule windows.
+- `test/sample.test.js`: the seeded studio is internally consistent and generated slots never collide with its bookings or blackouts.
 
 The demo also has a static check:
 

@@ -218,7 +218,7 @@ export function buildSampleData({ now = Date.now() } = {}) {
     weekStartKey,
     now,
     meta: {
-      label: "Sample studio — three practitioners, four services, one week",
+      label: "Sample studio, three practitioners, four services, one week",
       generatedAt: now,
     },
   };

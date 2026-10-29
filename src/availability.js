@@ -6,7 +6,7 @@
  * The conversion between the two is the whole job, and it has three sharp
  * edges that are easy to get wrong:
  *
- *   1. A window can cross midnight ("22:00"–"06:00"). It belongs to the
+ *   1. A window can cross midnight ("22:00", "06:00"). It belongs to the
  *      starting date, and the slots after midnight are on the next date.
  *   2. A wall time can be missing (spring forward) or repeated (fall back).
  *      Missing starts are skipped; repeated starts resolve to the earlier

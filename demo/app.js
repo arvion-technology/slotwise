@@ -1,4 +1,4 @@
-// Slotwise — demo application.
+// Slotwise, demo application.
 // All slot generation, timezone conversion, ICS output and cancellation quotes
 // come from ../src/*.js. This file renders them and handles the booking flow.
 import {
@@ -69,7 +69,7 @@ function weekRangeLabel(startKey) {
   const end = keyToDate(addDaysToKey(startKey, 6));
   const startLabel = start.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   const endLabel = end.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-  return `${startLabel} – ${endLabel} ${end.getUTCFullYear()}`;
+  return `${startLabel}, ${endLabel} ${end.getUTCFullYear()}`;
 }
 
 function wallInstant(dateKey, minutesFromMidnight, timeZone) {
@@ -280,7 +280,7 @@ function renderSlotPanel(slots) {
     ...groups.map((group) => {
       const service = serviceById(group.slots[0].serviceId);
       return el("div", { class: "slot-group" },
-        el("div", { class: "slot-time", text: `${timeLabel(group.start, state.timeZone)} – ${timeLabel(group.start + service.durationMinutes * MINUTE, state.timeZone)}` }),
+        el("div", { class: "slot-time", text: `${timeLabel(group.start, state.timeZone)}, ${timeLabel(group.start + service.durationMinutes * MINUTE, state.timeZone)}` }),
         el("div", { class: "slot-staff" },
           ...group.slots.map((slot) => {
             const staff = staffById(slot.staffId);
@@ -377,10 +377,10 @@ function openBooking(slot) {
   const notesInput = el("textarea", { class: "textarea", rows: "2", placeholder: "Anything the practitioner should know before the call?" });
 
   A.modal({
-    title: `${service.name} — ${dayLabel(slot.start, state.timeZone)}`,
+    title: `${service.name}, ${dayLabel(slot.start, state.timeZone)}`,
     body: el("div", { class: "col", style: "gap:14px" },
       el("div", { class: "row wrap" },
-        el("span", { class: "badge gold", text: `${timeLabel(slot.start, state.timeZone)} – ${timeLabel(slot.end, state.timeZone)}` }),
+        el("span", { class: "badge gold", text: `${timeLabel(slot.start, state.timeZone)}, ${timeLabel(slot.end, state.timeZone)}` }),
         el("span", { class: "badge", text: `${service.durationMinutes} minutes` }),
         el("span", { class: "badge", text: money(service.priceMinor) }),
         el("span", { class: "badge blue", text: staff.name })),
@@ -407,7 +407,7 @@ function openBooking(slot) {
             paddedStart: slot.start - service.bufferBeforeMinutes * MINUTE,
             paddedEnd: slot.end + service.bufferAfterMinutes * MINUTE,
           });
-          if (conflict) { A.toast("That slot was just taken — pick another", "error"); renderWeek(); return false; }
+          if (conflict) { A.toast("That slot was just taken, pick another", "error"); renderWeek(); return false; }
           const booking = {
             id: `bk-${Date.now().toString(36)}`,
             dateKey: dateKeyInZone(slot.start, DB.timeZone),
@@ -442,7 +442,7 @@ function downloadICS(bookings, filename) {
     staffName: booking.staffName || staffById(booking.staffId).name,
   })), {
     now: now(),
-    calendarName: "Northline Studio — bookings",
+    calendarName: "Northline Studio, bookings",
     organizer: { name: DB.studio.name, email: DB.studio.email },
   });
   A.download(filename, ics, "text/calendar");
@@ -456,7 +456,7 @@ function openConfirmation(booking) {
       el("p", { class: "small mb-0" }, el("b", { text: booking.serviceName }), " with ", el("b", { text: booking.staffName })),
       el("div", { class: "row wrap" },
         el("span", { class: "badge gold", text: longDayLabel(booking.start, state.timeZone) }),
-        el("span", { class: "badge", text: `${timeLabel(booking.start, state.timeZone)} – ${timeLabel(booking.end, state.timeZone)}` }),
+        el("span", { class: "badge", text: `${timeLabel(booking.start, state.timeZone)}, ${timeLabel(booking.end, state.timeZone)}` }),
         el("span", { class: "badge blue", text: money(booking.priceMinor) })),
       el("div", { class: "code-note", text: `DTSTART:${stamp}` }),
       el("p", { class: "small muted mb-0", text: "The .ics file stores the booking in UTC, so the receiving calendar shows the right hour in whatever zone your guest uses." })),
@@ -491,13 +491,13 @@ function openBookingDetail(booking) {
     body: el("div", { class: "col", style: "gap:12px" },
       el("div", { class: "row wrap" },
         el("span", { class: "badge gold", text: longDayLabel(booking.start, state.timeZone) }),
-        el("span", { class: "badge", text: `${timeLabel(booking.start, state.timeZone)} – ${timeLabel(booking.end, state.timeZone)}` }),
+        el("span", { class: "badge", text: `${timeLabel(booking.start, state.timeZone)}, ${timeLabel(booking.end, state.timeZone)}` }),
         el("span", { class: "badge blue", text: booking.staffName }),
         el("span", { class: "badge", text: booking.status })),
       el("div", { class: "kv", style: "grid-template-columns:110px 1fr" },
         el("dt", { text: "Customer" }), el("dd", { text: `${booking.customer.name} · ${booking.customer.email}` }),
         el("dt", { text: "Price" }), el("dd", { text: money(booking.priceMinor) }),
-        el("dt", { text: "Notes" }), el("dd", { text: booking.notes || "—" }),
+        el("dt", { text: "Notes" }), el("dd", { text: booking.notes || ", " }),
         el("dt", { text: "Stored start" }), el("dd", { class: "mono", style: "font-size:10.5px", text: new Date(booking.start).toISOString() })),
       el("div", { class: "divider", style: "margin:4px 0" }),
       el("div", { class: "row wrap" },
@@ -527,7 +527,7 @@ function renderBookings() {
   $("#booking-kpis").replaceChildren(
     ...[
       ["Upcoming", String(upcoming.length), "confirmed sessions", "gold"],
-      ["Next session", next ? dayLabel(next.start, state.timeZone) : "—", next ? `${timeLabel(next.start, state.timeZone)} · ${next.staffName}` : "nothing booked", "blue"],
+      ["Next session", next ? dayLabel(next.start, state.timeZone) : ", ", next ? `${timeLabel(next.start, state.timeZone)} · ${next.staffName}` : "nothing booked", "blue"],
       ["This week", `${hours.toFixed(1)}h`, `${thisWeek.length} sessions`, "green"],
       ["Pipeline", money(upcoming.reduce((sum, booking) => sum + booking.priceMinor, 0)), "booked value", "gold"],
     ].map(([label, value, sub, tone]) => el("div", { class: "card" },
@@ -552,7 +552,7 @@ function renderBookings() {
         label: "When",
         render: (booking) => el("div", { class: "booking-when" },
           el("span", { class: "day", text: dayLabel(booking.start, state.timeZone) }),
-          el("span", { class: "time", text: `${timeLabel(booking.start, state.timeZone)} – ${timeLabel(booking.end, state.timeZone)}` })),
+          el("span", { class: "time", text: `${timeLabel(booking.start, state.timeZone)}, ${timeLabel(booking.end, state.timeZone)}` })),
       },
       { label: "Service", render: (booking) => el("span", { style: "color:var(--text);font-weight:600", text: booking.serviceName }) },
       { label: "With", render: (booking) => el("span", { class: "small muted", text: booking.staffName }) },
@@ -670,7 +670,7 @@ function renderSettings() {
       if (!windows.length) return null;
       const label = windows.map((window) => {
         const [open, close] = Array.isArray(window) ? window : [window.start, window.end];
-        return `${open}–${close}`;
+        return `${open}, ${close}`;
       }).join(", ");
       return `${dayNames[weekday]} ${label}`;
     }).filter(Boolean);
@@ -681,7 +681,7 @@ function renderSettings() {
 
   $("#blackouts-list").replaceChildren(...DB.blackouts.map((blackout) => el("div", { class: "blackout-row" },
     el("span", { class: "reason", text: blackout.reason }),
-    el("span", { class: "when", text: `${dayLabel(blackout.start, state.timeZone)} · ${timeLabel(blackout.start, state.timeZone)}–${timeLabel(blackout.end, state.timeZone)}` }))));
+    el("span", { class: "when", text: `${dayLabel(blackout.start, state.timeZone)} · ${timeLabel(blackout.start, state.timeZone)}, ${timeLabel(blackout.end, state.timeZone)}` }))));
 
   $("#policy-table").replaceChildren(...policyTable(DB.policy).map((tier) => el("div", { class: "policy-row" },
     el("span", { class: "fee", text: tier.feePercent === 0 ? "free" : `${tier.feePercent}%` }),
